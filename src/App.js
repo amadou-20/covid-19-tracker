@@ -8,11 +8,18 @@ import Map from "./Map";
 function App() {
   const [country, setCountry] = useState('worldwide');
   const [countries, setCountries] = useState([]);
-
-  // https://disease.sv/v3/covid-19/countries
+  const [countryInfo, setCountryInfo] = useState({});
+  const [InputCountry, setInputCountry] = useState({});
 
   useEffect(() => {
-    // async --> send a request, wait for it, do something with
+    fetch("https://disease.sh/v3/covid-19/all")
+      .then((response) => response.json())
+      .then((data) => {
+        setCountryInfo(data);
+      });
+  }, []);
+
+  useEffect(() => {
     const getCountriesData = async() => {
     await  fetch("https://disease.sh/v3/covid-19/countries")
        .then((reponse) => reponse.json())
@@ -33,7 +40,20 @@ function App() {
 
     console.log('YOOOO >>>>', countryCode);
     setCountry(countryCode);
-  }
+
+
+    const url =
+    countryCode === "worldwide"
+      ? "https://disease.sh/v3/covid-19/all"
+      : `https://disease.sh/v3/covid-19/countries/${countryCode}`;
+       fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      setInputCountry(countryCode);
+      setCountryInfo(data);
+    })
+
+  };
 
   return (
     <div className="app">
@@ -55,9 +75,9 @@ function App() {
         </div>
 
         <div className="app_stats">
-          <InfoBox title="Coronavirus Cases" cases={300} total={400} />
-          <InfoBox title="Recovered" cases={100} total={300} />
-          <InfoBox title="Deaths" cases={2200} total={3000} />
+          <InfoBox title="Coronavirus Cases" cases={countryInfo.todayCases} total={countryInfo.cases} />
+          <InfoBox title="Recovered" cases={countryInfo.todayRecovered} total={countryInfo.recovered} />
+          <InfoBox title="Deaths" cases={countryInfo.todayDeaths} total={countryInfo.deaths} />
         </div>
 
         <Map />
