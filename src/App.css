@@ -1,6 +1,10 @@
 * {
   margin: 0;
 }
+.app {
+  display: flex;
+}
+
 body {
   background-color: #f5f6fa;
 }
