@@ -3,13 +3,17 @@ import './App.css';
 import { MenuItem, FormControl, Select, Card, CardContent  } from '@material-ui/core';
 import InfoBox from "./InfoBox";
 import Map from "./Map";
+import Table from "./Table";
+import { sortData } from "./Util";
+
 
 
 function App() {
-  const [country, setCountry] = useState('worldwide');
+
   const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState('worldwide');
   const [countryInfo, setCountryInfo] = useState({});
-  const [InputCountry, setInputCountry] = useState({});
+  const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
     fetch("https://disease.sh/v3/covid-19/all")
@@ -29,18 +33,20 @@ function App() {
          value: country.countryInfo.iso2 // USA, UK, FR
          }));
 
+      const sortedData = sortData(data);
+      setTableData(sortedData);
       setCountries(countries);
        });
     }
+    
     getCountriesData();
   }, [countries]);
 
   const onCountryChange = (event) => {
     const countryCode = event.target.value;
-
     console.log('YOOOO >>>>', countryCode);
     setCountry(countryCode);
-
+  
 
     const url =
     countryCode === "worldwide"
@@ -49,7 +55,6 @@ function App() {
        fetch(url)
     .then((response) => response.json())
     .then((data) => {
-      setInputCountry(countryCode);
       setCountryInfo(data);
     })
 
@@ -86,7 +91,7 @@ function App() {
       <Card className="app_right">
         <CardContent>
           <h3>Live Cases by Country</h3>
-          { /*Table*/ }
+          <Table countries={tableData} />
           <h3>Worldwide new cases</h3>
           { /*Graph*/ }
           </CardContent>
